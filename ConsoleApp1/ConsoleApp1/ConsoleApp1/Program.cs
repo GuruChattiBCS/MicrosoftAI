@@ -14,24 +14,27 @@ namespace CSHttpClientSample
         // Replace <Subscription Key> with your valid subscription key.
         const string subscriptionKey = "c83663514e3b4957a6b12d7bacbbb035";
 
-		// You must use the same region in your REST call as you used to
-		// get your subscription keys. For example, if you got your
-		// subscription keys from westus, replace "westcentralus" in the URL
-		// below with "westus".
-		//
-		// Free trial subscription keys are generated in the westcentralus region.
-		// If you use a free trial subscription key, you shouldn't need to change
-		// this region.
-		const string uriBase =
-		"https://australiaeast.api.cognitive.microsoft.com/vision/v1.0/analyze";
+        // You must use the same region in your REST call as you used to
+        // get your subscription keys. For example, if you got your
+        // subscription keys from westus, replace "westcentralus" in the URL
+        // below with "westus".
+        //
+        // Free trial subscription keys are generated in the westcentralus region.
+        // If you use a free trial subscription key, you shouldn't need to change
+        // this region.
+        const string uriBase =
+            "https://australiaeast.api.cognitive.microsoft.com/vision/v1.0/analyze";
 		//const string uriBase = "https://southcentralus.api.cognitive.microsoft.com/customvision/v2.0/Prediction/944ff731-4121-4c51-92ec-41a303ff8356/image?iterationId=144100ac-89bb-4230-8da4-7986cd275e4c";
 
         static void Main()
         {
+			while (true)
+			{
             // Get the path and filename to process from the user.
-           Console.WriteLine("Analyze an image:");
+            Console.WriteLine("Analyze an image:");
             Console.Write("Enter the path to the image you wish to analyze: ");
             string imageFilePath = Console.ReadLine();
+				imageFilePath = imageFilePath.Replace('"', ' ');
 
             if (File.Exists(imageFilePath))
             {
@@ -43,8 +46,13 @@ namespace CSHttpClientSample
             {
                 Console.WriteLine("\nInvalid file path");
             }
-            Console.WriteLine("\nPress Enter to exit...");
-            Console.ReadLine();
+				Console.WriteLine("\nPress Enter to continue or N to exit...");
+				string input = Console.ReadLine();
+				if(input == "n" || input == "N")
+				{
+					break;
+				}
+			}
         }
 
         /// <summary>
@@ -101,23 +109,29 @@ namespace CSHttpClientSample
 						}
 						category_str = category_str.Remove(category_str.Length - 2);
 						Console.WriteLine(category_str);
+						Console.WriteLine();
 					}
 					if (imageDetail.faces != null)
 					{
-						int FacesCount = 0;
-						imageDetail.faces.GetLength(FacesCount);
+						int FacesCount = imageDetail.faces.Length;
 						if (FacesCount > 0)
 						{
-							Console.WriteLine("Aged: " + imageDetail.faces[0].age);
-							Console.WriteLine("Gender: " + imageDetail.faces[0].gender);
+							int count = 0;
+							Console.WriteLine("There are " + FacesCount + " in the image");
+							foreach (var item in imageDetail.faces)
+							{
+								count++;
+								Console.WriteLine("Deatils of Object" + count);
+								Console.WriteLine("Aged: " + item.age);
+								Console.WriteLine("Gender: " + item.gender);
+							}
+							Console.WriteLine();
 						}
 					}
 					if((imageDetail.description != null)&&(imageDetail.description.captions != null))
 						Console.WriteLine("Caption: " + imageDetail.description.captions[0].text);
 				}
-
-				//Console.ReadLine();
-			}
+            }
             catch (Exception e)
             {
                 Console.WriteLine("\n" + e.Message);
